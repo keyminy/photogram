@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.my.message.mapper.MessageMapper">
+	  <!-- 1.메시지 리스트 보기 -->
+	 	<select id="list" resultType="com.my.message.vo.MessageVO">
+			SELECT rnum,no,sender,senderName,TO_CHAR(sendDate,'yyyy.mm.dd') sendDate
+			,accepter,accepterName,TO_CHAR(acceptDate,'yyyy.mm.dd') acceptDate 
+			FROM(
+			    SELECT ROWNUM rnum,no,sender,senderName,sendDate,accepter,accepterName,acceptDate
+			    FROM(
+			        SELECT m.no,m.sender,sm.name senderName,m.sendDate,m.accepter,am.name accepterName,m.acceptDate 
+			        FROM message m,member sm,member am
+			        <include refid="condition"/>
+			        AND (m.sender = sm.id AND m.accepter = am.id)
+			        ORDER BY no DESC
+			        )
+			    )
+			WHERE rnum between #{startRow} and #{endRow}
+	 	</select>
+	 	
+		<!-- acceptMode에 따른 sql태그-->
+	  <!-- 보여줄 메시지 모드 : 1.받은메시지,2.보낸메시지,3.모든메시지(기본)
+	 ,4.새로운메시지(내가 받은 메시지중 읽지않은 새로운 메시지) -->
+	 	<sql id="condition">
+	 		<choose>
+	 	    <when test="acceptMode==1">
+					WHERE (m.accepter = #{accepter}) 
+	      </when>
+	 	    <when test="acceptMode==2">
+					WHERE (m.sender = #{accepter}) 
+	      </when>
+	 	    <when test="acceptMode==3">
+					WHERE (m.sender = #{accepter} OR m.accepter = #{accepter}) 
+	      </when>
+	 	    <when test="acceptMode==4">
+					WHERE ((m.accepter = #{accepter}) AND acceptDate IS NULL)  
+	      </when>
+	    </choose>
+	 	</sql>
+	 	
+	 	<sql id="page_condition">
+	 		<choose>
+	 	    <when test="acceptMode==1">
+					WHERE (accepter = #{accepter}) 
+	      </when>
+	 	    <when test="acceptMode==2">
+					WHERE (sender = #{accepter}) 
+	      </when>
+	 	    <when test="acceptMode==3">
+					WHERE (sender = #{accepter} OR accepter = #{accepter}) 
+	      </when>
+	 	    <when test="acceptMode==4">
+					WHERE ((accepter = #{accepter}) AND acceptDate IS NULL)  
+	      </when>
+	    </choose>
+	 	</sql>
+	 	
+	 	<!-- 1-1.메시지 전체 글 갯수 구하기 -->
+	 	<select id="getTotalRow" resultType="java.lang.Long">
+	 		SELECT COUNT(*) FROM message 
+	 		<include refid="page_condition"/>
+	 	</select>
+
+	  <!-- 2.메시지 글보기 글번호인 no를 받아옴 -->
+	  <select id="view" resultType="com.my.message.vo.MessageVO">
+			SELECT m.no,m.content,m.sender,sm.name senderName,
+			TO_CHAR(m.sendDate,'yyyy.mm.dd HH24:MI:SS') sendDate,m.accepter,am.name accepterName,
+			TO_CHAR(m.acceptDate,'yyyy.mm.dd HH24:MI:SS') acceptDate 
+			FROM message m,member sm,member am
+			WHERE (m.no=#{no}) AND (m.sender = sm.id AND m.accepter = am.id)
+	  </select>
+	  <!--2-1.메시지 읽음 상태처리 -->
+	  <update id="acceptDate_update">
+	  	UPDATE message SET acceptDate = sysdate 
+	  	WHERE no=#{no} AND acceptDate IS NULL AND accepter = #{accepter}
+	  </update>
+
+	  <!-- 3.메시지 글쓰기 -->
+	  <insert id="write">
+			INSERT INTO message(no,content,sender,accepter)
+			VALUES(message_seq.nextval,#{content},#{sender},#{accepter})
+	  </insert>
+	  <!-- 4.메시지 삭제 -->
+	 <delete id="delete">
+			DELETE FROM message
+			WHERE no=#{no} AND 
+			((accepter=#{sender}) OR (sender=#{sender} AND acceptDate IS NULL))
+  	</delete> 
+  </mapper>

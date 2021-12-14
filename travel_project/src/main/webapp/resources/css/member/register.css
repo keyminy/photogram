@@ -1,0 +1,18 @@
+@charset "UTF-8";
+	.Btns{
+		display: flex;
+		justify-content:center;
+	}
+	.Btns button{
+		margin: 5px;
+	}
+	.idBtns{
+		display:flex;
+	}
+	#checkId{
+		display: inline-block;
+		margin-left: 30px;
+	}
+	#doubleCheckBtn{
+		margin-left: 30px;
+	}

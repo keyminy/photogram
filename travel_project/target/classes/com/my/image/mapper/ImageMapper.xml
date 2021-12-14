@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.my.image.mapper.ImageMapper">
+  	<!--1.이미지 게시판 리스트 -->
+  	<select id="list" resultType="com.my.image.vo.ImageVO">
+	  	SELECT rnum,no,title,id,name,writeDate,fileName
+	  	FROM(
+		  	SELECT ROWNUM rnum,no,title,id,name,writeDate,fileName
+		  	FROM(
+		  		SELECT i.no,i.title,i.id,m.name,i.writeDate,i.fileName
+		  		FROM image i,member m
+		  		WHERE i.id = m.id
+		  		ORDER BY no DESC
+		  	)
+		  )
+		  WHERE rnum BETWEEN #{startRow} and #{endRow}
+  	</select>
+  	  	
+  	<!-- 1-1.게시판 전체 글의 갯수를 구하는 쿼리 -->
+  	<select id="getTotalRow" resultType="java.lang.Long">
+  		SELECT count(*) FROM image
+  	</select>
+  	
+  	<!-- 2.이미지 게시판 글보기 public ImageVO view(Long no);로, Long타입의 no를 넘겨줌-->
+  	<select id="view" resultType="com.my.image.vo.ImageVO">
+  		<choose>
+  	    <when test="id!=null">
+					SELECT i.no,i.title,i.content,i.id,m.name,i.writeDate,i.fileName,
+		  		(SELECT 'LIKED' FROM image_like WHERE no=#{no} AND id=#{id}) myLiked,
+		  		(SELECT COUNT(*) FROM image_like WHERE no=#{no}) likeCnt 
+		  		FROM image i,member m 
+		  		WHERE (i.no=#{no}) AND (i.id = m.id)
+	      </when>
+	      <otherwise>
+		  		SELECT i.no,i.title,i.content,i.id,m.name,i.writeDate,i.fileName,
+		  		(SELECT COUNT(*) FROM image_like WHERE no=#{no}) likeCnt 
+		  		FROM image i,member m 
+		  		WHERE (i.no=#{no}) AND (i.id = m.id)
+	      </otherwise>
+	    </choose>
+  	</select>
+  	
+  	<!-- 2-1.게시판 글보기 시 조회수 1증가하기 -> 안함 -->
+
+  	<!--3.이미지 게시판 글쓰기 -->
+  	<insert id="write">
+  		INSERT INTO image(no,title,content,id,fileName)
+  		VALUES(image_seq.nextval,#{title},#{content},#{id},#{fileName})
+  	</insert>
+  	<!-- 4-1.이미지 파일 수정 -->
+  	<update id="changeImage">
+  		UPDATE image SET fileName=#{fileName} 
+  		WHERE no = #{no}
+  	</update>
+  	<!-- 4-2.이미지 글수정,title과 content만 바꾸기가능-->
+  	<update id="update">
+  		UPDATE image SET title=#{title}, content=#{content} 
+  		WHERE no = #{no}
+  	</update>
+  	<!-- 5.이미지 글삭제 -->
+  	<delete id="delete">
+  		DELETE FROM image 
+  		WHERE no = #{no}
+  	</delete> 
+  	<!-- 6.이미지 좋아요-->
+  	<insert id="dolike">
+  		INSERT INTO image_like(no,id) 
+  		VALUES(#{no},#{id})
+  	</insert>
+
+  	<!-- 7.이미지 좋아요 취소-->
+  	<delete id="likeCancle">
+			DELETE FROM image_like
+			WHERE no=#{no} AND id=#{id}
+  	</delete>
+  </mapper>
