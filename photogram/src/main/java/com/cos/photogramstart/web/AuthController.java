@@ -56,13 +56,14 @@ public class AuthController {
 				// getFieldErrors() : 리스트 리턴
 				errorMap.put(error.getField(), error.getDefaultMessage());
 				System.out.println("====================");
-				System.out.println(error.getDefaultMessage());
+				System.out.println(error.getDefaultMessage()); //20자 이하여야 합니다.
 				System.out.println("====================");
 			}
 			//return "오류남"; //이거하지말고 오류가 나면 RuntimeException 발생시키자
 			//throw new RuntimeException("유효성 검사 실패함");
 			throw new CustomValidationException("유효성 검사 실패함",errorMap);
-		}else {
+		} //end if
+		else {
 			//else문 : 회원가입이 실행됨
 			//User 객체에 <- 매개변수 SignupDto(회원이 입력한거) 넣기
 			User user = signupDto.toEntity();

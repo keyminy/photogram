@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity //db에 테이블을 생성하기
 public class User {
-	//@Id : No identifier specified for entity(entity에 대한 pk가 없어서..)
+	//@Id : No identifier specified for entity(entity에 대한 pk가 없어서 없으면 오류..)
 	//@GeneratedValue : auto_increment
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY) //번호 증가 전략이 db를 따라간다.(=Identity전략쓰기)

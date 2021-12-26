@@ -13,7 +13,7 @@ public class CustomValidationException extends RuntimeException{
 	
 	//생성자 정의
 	public CustomValidationException(String message,Map<String, String> errorMap) {
-		super(message);//메시지에 대한 게터 : 그냥 부모한테 던지기
+		super(message);//메시지에 대한 게터안만들어도 되는이유 : 이렇게 그냥 부모한테 던지기
 		this.errorMap = errorMap;
 	}
 	//게터(메시지에 대한 게터는 안만들어도됨)

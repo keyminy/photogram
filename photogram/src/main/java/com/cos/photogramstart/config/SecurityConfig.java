@@ -31,7 +31,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 		//.loginProcessingUrl("/auto/signin") //post방식으로 로그인 요청시
 		//.defaultSuccessUrl("/"); : 로그인이 정상적으로 됬으면 /로 가게하기
 		http.authorizeRequests()
-			.antMatchers("/","/user/**","/image/**","/subscribe/**","/comment/**").authenticated()
+			.antMatchers("/","/user/**","/image/**","/subscribe/**","/comment/**","/api/**").authenticated()
 			.anyRequest().permitAll()
 			.and()
 			.formLogin()
