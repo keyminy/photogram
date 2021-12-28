@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cos.photogramstart.handler.ex.CustomApiException;
+import com.cos.photogramstart.handler.ex.CustomException;
 import com.cos.photogramstart.handler.ex.CustomValidationApiException;
 import com.cos.photogramstart.handler.ex.CustomValidationException;
 import com.cos.photogramstart.util.Script;
@@ -33,7 +34,19 @@ public class ControllerExceptionHandler {
 		//2.Ajax통신을 할땐 CMRespDto를 쓰게됨.
 		//3.Android통신도 CMRespDto씀
 		//1번은 클라이언트가 응답받는거 2,3번은 개발자가 응답받을때임.
-		return Script.back(e.getErrorMap().toString());
+		//System.out.println("나 발동되나???==========");
+		//.getErrorMap()" is null 오류... e.getErrorMap()이 null인 경우와 null이 아닌 경우를 분기시켜주자.
+		if(e.getErrorMap()==null) {
+			return Script.back(e.getMessage());
+		}else {
+			return Script.back(e.getErrorMap().toString());			
+		}
+	}
+	
+	//Userservice에서 회원프로필 못찾았을때
+	@ExceptionHandler(CustomException.class)
+	public String customException(CustomException e) {
+		return Script.back(e.getMessage());
 	}
 	
 	@ExceptionHandler(CustomValidationApiException.class) // errorMap의 메시지를 얻기위해

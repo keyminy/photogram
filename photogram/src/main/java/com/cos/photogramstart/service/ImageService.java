@@ -39,7 +39,7 @@ public class ImageService {
 		}
 		
 		//image테이블에 저장 
-		//imageUploadDto내용을 Image객체로 변환 후 save
+		//imageUploadDto를 -> Image객체로 변환 후 save
 		Image image = imageUploadDto.toEntity(imageFileName,principalDetails.getUser());
 		//imageFileName : b2b8c9e9-f40e-4dbd-9aa1-56b901c84f2b_캡처.JPG
 		//근데 앞에 D:로 시작하는 경로는?? yml에 적혀있는걸로 쓰자 -> 나중에 webConfig설정하드라
