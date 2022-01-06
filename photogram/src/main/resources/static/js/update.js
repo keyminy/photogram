@@ -14,7 +14,7 @@ function update(userid,event) {
 	}).done(res=>{ //HttpStatus 상태코드가 200번일때 
 		// 서버로부터 받은 json데이터를 파싱해서 res변수에 저장한다. => res는 js의 object가됨
 		console.log("성공, " , res);
-		//location.href=`/user/${userid}`; //자기 원래 페이지로 돌아가기
+		location.href=`/user/${userid}`; //자기 원래 페이지로 돌아가기
 	}).fail(error=>{ //HttpStatus 상태코드가 200번이 아닐때
 		//(M1)하드코딩
 		//console.log("update실패!" , error.responseJSON.data.name);

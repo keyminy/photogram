@@ -13,6 +13,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.PrePersist;
 
 import com.cos.photogramstart.domain.image.Image;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -50,6 +51,7 @@ public class User {
 	@OneToMany(mappedBy="user",fetch=FetchType.LAZY) //한명의 User는 여러 Image를 만들 수 있다. 1:N
 	//mappedBy : 1.나는 연관관계의 주인이 아니다, 그러므로 테이블에 컬럼을 만들지마.
 	//2.User를 Select할때 해당 User id로 등록된 iamge들을 다 가져와.
+	@JsonIgnoreProperties({"user"}) //JSON으로 파싱할 때, Image클래스 내부에 있는 User user의 getter호출 못하게
 	private List<Image> images;
 	//Eager로할때
 	//select user0_.id as id1_2_0_, user0_.bio as bio2_2_0_, user0_.createDate as createda3_2_0_, user0_.email as email4_2_0_, user0_.gender as gender5_2_0_, user0_.name as name6_2_0_, user0_.password as password7_2_0_, user0_.phone as phone8_2_0_, user0_.profileImageUrl as profilei9_2_0_, user0_.role as role10_2_0_, user0_.username as usernam11_2_0_, user0_.website as website12_2_0_

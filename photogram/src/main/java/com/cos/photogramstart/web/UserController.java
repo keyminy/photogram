@@ -1,5 +1,7 @@
 package com.cos.photogramstart.web;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import com.cos.photogramstart.config.auth.PrincipalDetails;
 import com.cos.photogramstart.domain.user.User;
 import com.cos.photogramstart.service.UserService;
+import com.cos.photogramstart.web.dto.user.UserProfileDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,17 +23,23 @@ public class UserController {
 	
 	private final UserService userService;
 	
-	@GetMapping("/user/{id}")
-	public String profile(@PathVariable int id,Model model) {
-		User userEntity = userService.회원프로필(id);
-		model.addAttribute("user",userEntity);
+	private static final Logger log = LoggerFactory.getLogger(UserController.class);
+
+	
+	@GetMapping("/user/{pageUserId}")
+	//pageUserId : 페이지아이디 , 로그인한 사용자아디(userid)와 다르다..
+	//principalDetails : 로그인한 사용자의 아디
+	public String profile(@PathVariable int pageUserId,Model model
+			,@AuthenticationPrincipal PrincipalDetails principalDetails) {
+		UserProfileDto dto = userService.회원프로필(pageUserId,principalDetails.getUser().getId());
+		model.addAttribute("dto",dto);
 		return "/user/profile";
 	}
 	@GetMapping("/user/{id}/update")
-	public String update(@PathVariable int id
+	public String updateForm(@PathVariable int id
 			,@AuthenticationPrincipal PrincipalDetails principalDetails) {
 		// (M1)추천
-		System.out.println("세션 정보 : " + principalDetails.getUser());
+		//log.info("세션 정보 : " + principalDetails.getUser());
 		//결과 : User(id=1,username=ssar~~)
 			
 		//(M2)비추
